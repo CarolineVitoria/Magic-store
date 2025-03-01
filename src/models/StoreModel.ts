@@ -1,4 +1,3 @@
-import { kMaxLength } from 'buffer';
 import mongoose, { Document, Schema } from 'mongoose';
 
 
@@ -20,6 +19,13 @@ const storeSchema = new mongoose.Schema({
     rua: {
         type: String, 
         required: [true, 'A rua é obrigatória']
+    },
+    bairro: {
+        type: String,
+        required: [true, 'O bairro é obrigatória']
+    },
+    complemento: {
+        type: String,
     },
     estado: {
         type: String,
