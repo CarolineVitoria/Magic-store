@@ -1,8 +1,9 @@
 import express from "express";
-import { criaLoja, todasLojas } from "../controllers/storeController"; 
+import { getLojasProximas, todasLojas, criaLoja } from "../controllers/storeController"; 
 const router = express.Router();
 
 router.route('/').get(todasLojas)
 router.route('/add').post(criaLoja);
+router.route('/:cep').get(getLojasProximas);
 
 export default router;
