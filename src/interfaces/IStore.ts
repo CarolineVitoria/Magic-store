@@ -1,6 +1,6 @@
 import { Types } from 'mongoose';
 export interface IReqStore {
-    nome: string;
+    nome?: string;
     cep: string;
     cidade: string;
     rua: string;

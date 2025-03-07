@@ -3,6 +3,7 @@ import { validaCep } from '../utils/validaCep';
 
 
 export const pegaEndereco = async (cep: string) => {
+  
   if (!validaCep(cep)) {
     throw new Error('CEP inválido');
   }

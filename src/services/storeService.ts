@@ -3,9 +3,14 @@ import dotenv from "dotenv";
 dotenv.config({ path: "../config.env" });
 import Store from "../models/StoreModel";
 import { IReqStore } from '../interfaces/IStore';
+import {IDistancia, IDistanciaLojas} from '../interfaces/IDistance';
 import { pegaEndereco } from './cepService';
+import logger from '../utils/logger';
 
 export const calculaDistancia = async (origemClinte: string, destinoLoja: string) => {
+  try{
+  logger.info({ message: 'Calculando distância para lojas', localizacaoCliente: origemClinte, localizacaoLoja: destinoLoja});
+
     const url = 'https://routes.googleapis.com/directions/v2:computeRoutes'
     const apiKey = process.env.KEY;
     
@@ -24,52 +29,42 @@ export const calculaDistancia = async (origemClinte: string, destinoLoja: string
       routing_preference: "TRAFFIC_AWARE",
       travel_mode: "DRIVE",
     };
-    try{
+    
       const distancia = await axios.post(url, corpo, {headers})
-      console.log(distancia.data.routes[0]);
+      logger.info({ message: 'Distancia obtida com sucesso'});
       return distancia.data.routes[0];
     }catch (error:any) {
-      console.error('Erro ao fazer a requisição:', error);
+      logger.error({ message: 'Erro ao calcular distância', error: error.message });
+      throw error;
     
     }
      
   }
 
-function ordenarRotas(lojasPorDistancia) {
+function ordenarRotas(lojasPorDistancia:IDistanciaLojas[]): IDistanciaLojas[] {
     return lojasPorDistancia.sort((a, b) => {
-      if (a.distanciaKm === b.distanciaKm) {
-        return a.duracaoSegundos - b.duracaoSegundos; 
-      }
       return a.distanciaKm - b.distanciaKm; 
     });
   }
-export const pegaDistancia = async(enderecoCliente) =>{
-  //precisa organizar
-    interface Distancia {
-      distanceMeters: number,
-      duration: string
-    }
-    interface DistanciaLojas {
-      nome: string,
-      distanciaKm: number,
-      duracao: string,
-    }
+export const pegaDistancia = async(origemClinte:IReqStore) =>{
     //preciso testar mais
-    enderecoCliente = `${enderecoCliente.rua}, ${enderecoCliente.bairro}, ${enderecoCliente.cidade} - ${enderecoCliente.uf}, Brasil`;
+    try{
+    logger.info({ message: 'Pegando a distancia'});
+    const enderecoCliente = `${origemClinte.rua}, ${origemClinte.bairro}, ${origemClinte.cidade} - ${origemClinte.uf}, Brasil`;
   
     const lojas = await Store.find().orFail();
   
-    const lojasPorDistancia: DistanciaLojas[] = [];
+    const lojasPorDistancia: IDistanciaLojas[] = [];
     for(const loja of lojas){
       
       const enderecoLoja = `${loja.rua}, ${loja.bairro}, ${loja.cidade} - ${loja.uf}, Brasil`;
-      let distancia: Distancia = await calculaDistancia(enderecoCliente, enderecoLoja);
+      let distancia: IDistancia = await calculaDistancia(enderecoCliente, enderecoLoja);
   
       const distanceKm:number = distancia.distanceMeters/1000;
       const horas:number = Math.floor(Number(distancia.duration.replace('s', '')) / 3600); // 1 hora = 3600 segundos
       const minutos:number = Math.floor((Number((distancia.duration.replace('s', ''))) % 3600) / 60); 
   
-      let distanciaLoja:DistanciaLojas = {
+      let distanciaLoja:IDistanciaLojas = {
         nome: loja.nome,
         distanciaKm: distanceKm,
         duracao: `${horas}H, ${minutos}min`,
@@ -82,10 +77,16 @@ export const pegaDistancia = async(enderecoCliente) =>{
       
     }
     return (ordenarRotas(lojasPorDistancia));
+    }catch(error:any){
+      logger.error({ message: 'Erro ao pegar distância', error: error.message });
+      throw error;
+    }
+    
   } 
 
 //preenche os dados e caso não tenha alguma informação manterá os dados passados
 export const cadastraLoja = async (reqStore: IReqStore) => {
+  logger.info({ message: 'Cadastrando a loja'});
   try {
     const endereco = await pegaEndereco(reqStore.cep);
     
@@ -108,11 +109,11 @@ export const cadastraLoja = async (reqStore: IReqStore) => {
       reqStore.cidade = endereco.cidade;
     }
     console.log("req da loja:", reqStore);
-    const novaLoja = Store.create(reqStore);
+    const novaLoja = await Store.create(reqStore);
     return novaLoja;
-  } catch (err: any) {
-    console.log("Erro ao cadastrar loja:", err.message || err);
-    return err.message; 
-    // Retorna null para que minhaReq fique sem dados válidos para ser armazenado no banco
+  } catch (error: any) {
+    logger.error({ message: 'Erro ao cadastrar loja', error: error.message });
+    throw error;
+
   }
 };

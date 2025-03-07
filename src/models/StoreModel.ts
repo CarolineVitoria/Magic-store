@@ -6,7 +6,8 @@ const storeSchema = new mongoose.Schema({
     nome: {
         type: String, 
         required: [true, 'O nome é obrigatório'],
-        minlength: [11, 'o nome deve ter pelo menos 11 letras']
+        minlength: [11, 'o nome deve ter pelo menos 11 letras'],
+        unique: [true, 'Já existe uma loja com esse nome']
     },
     cep: { //precisa ser String pq se o CEP começa com 0 o mongo por padrão irá tirar-lo
         type: String, 

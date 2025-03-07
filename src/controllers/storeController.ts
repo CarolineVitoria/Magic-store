@@ -1,25 +1,16 @@
 import Store from "../models/StoreModel"
-import { Request, Response, NextFunction, RequestHandler } from "express";
-import axios from "axios";
+import { Request, Response} from "express";
 import dotenv from "dotenv";
 dotenv.config({ path: "../../config.env" });
 import { pegaEndereco } from '../services/cepService';
 import { cadastraLoja, pegaDistancia } from "../services/storeService";
-import { validaCep } from "../utils/validaCep";
 
-//definir os tipos da minha req
-type reqStore = {
-  nome : string,
-  cep: string,
-  cidade: string,
-  rua: string,
-  estado: string,
-  bairro: string,
-  complemento: string,
-}
+import { IReqStore } from "../interfaces/IStore";
+
+
 export const getLojasProximas = async (req: Request, res: Response) =>{
   try {
-    const endereco = await pegaEndereco(req.params.cep);
+    const endereco:IReqStore = await pegaEndereco(req.params.cep); //!
     const lojasPorDistancia = await pegaDistancia(endereco);
     if(lojasPorDistancia.length !== 0){
       res.status(200).json(lojasPorDistancia);
@@ -33,7 +24,6 @@ export const getLojasProximas = async (req: Request, res: Response) =>{
 }
 
 export const todasLojas = async (req: Request, res: Response): Promise<void> => {
-
   try {
     const stores = await Store.find();
     if (stores.length === 0) {
