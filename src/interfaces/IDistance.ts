@@ -1,9 +1,14 @@
 export interface IDistancia {
-    distanceMeters: number,
-    duration: string
-  }
+  distanceMeters: number;
+  duration: string;
+}
 export interface IDistanciaLojas {
-    nome: string,
-    distanciaKm: number,
-    duracao: string,
-  }
+  nome: string;
+  distancia: string;
+  duracao: string;
+  rua: string;
+  numero?: string;
+  bairro: string;
+  uf: string;
+  complemento?: string;
+}

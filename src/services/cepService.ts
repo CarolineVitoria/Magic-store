@@ -1,9 +1,9 @@
 import axios from 'axios';
 import { validaCep } from '../utils/validaCep';
-
+import logger from '../utils/logger';
+import { IEndereco } from '../interfaces/IAddress';
 
 export const pegaEndereco = async (cep: string) => {
-  
   if (!validaCep(cep)) {
     throw new Error('CEP inválido');
   }
@@ -14,15 +14,15 @@ export const pegaEndereco = async (cep: string) => {
   if (data.erro) {
     throw new Error('CEP não encontrado');
   }
-  console.log(data);
-  return {
+  logger.info(data);
+  const endDados: IEndereco = {
     rua: data.logradouro,
     bairro: data.bairro,
     cidade: data.localidade,
     uf: data.uf,
     estado: data.estado,
     complemento: data.complemento,
-    cep: data.cep
+    cep: data.cep,
   };
+  return endDados;
 };
-

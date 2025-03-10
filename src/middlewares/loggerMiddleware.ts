@@ -1,7 +1,11 @@
 import { Request, Response, NextFunction } from 'express';
 import logger from '../utils/logger';
 
-export const loggerMiddleware = (req: Request, res: Response, next: NextFunction) => {
+export const loggerMiddleware = (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   const { method, url, body, query } = req;
   const start = Date.now();
 
@@ -10,7 +14,7 @@ export const loggerMiddleware = (req: Request, res: Response, next: NextFunction
     method,
     url,
     body,
-    query
+    query,
   });
 
   res.on('finish', () => {
@@ -21,7 +25,7 @@ export const loggerMiddleware = (req: Request, res: Response, next: NextFunction
       method,
       url,
       status: res.statusCode,
-      tempo: `${duration}ms`
+      tempo: `${duration}ms`,
     });
   });
 
