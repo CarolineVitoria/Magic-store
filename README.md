@@ -14,7 +14,7 @@ Crie um arquivo .env e adicione:
 
 PORT=3000
 
-DB_CONNECTION_STRING=mongodb://localhost:27017/lojas
+DB_CONNECTION_STRING=mongodb:xxxxx
 
 GOOGLE_MAPS_API_KEY=xxxxxx
 
