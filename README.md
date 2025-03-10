@@ -13,7 +13,9 @@ npm install
 Crie um arquivo .env e adicione:
 
 PORT=3000
-MONGO_URI=mongodb://localhost:27017/lojas
+
+DB_CONNECTION_STRING=mongodb://localhost:27017/lojas
+
 GOOGLE_MAPS_API_KEY=xxxxxx
 
 3️⃣- Inicie o servidor
