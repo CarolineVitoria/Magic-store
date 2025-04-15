@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { validaCep } from '../utils/validaCep';
+import { validaCep } from '../utils/valida-cep';
 import logger from '../utils/logger';
 import { IEndereco } from '../interfaces/IAddress';
 
