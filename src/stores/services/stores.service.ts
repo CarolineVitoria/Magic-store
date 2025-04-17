@@ -7,17 +7,24 @@ import { pegaEndereco } from '../../utils/cep.service';
 import { IDistanciaLojas } from '../../interfaces/IDistance';
 import Store from '../../models/StoreModel';
 import { calculaFrete } from '../../utils/frete.service';
-import { calculaDistancia, converteMedidas, ordenarRotas } from './diastancia';
+import { LojaComFreteFormatado } from '../../interfaces/IFrete';
+import {
+  calculaDistancia,
+  converteMedidas,
+  ordenarRotas,
+  pegaCoordenadas,
+} from './diastancia';
 
 @Injectable()
 export class StoresService {
   constructor(
-    @InjectModel('stores') private readonly storeModel: Model<IStore>, // Use o nome correto 'stores'
+    @InjectModel('stores') private readonly storeModel: Model<IStore>,
   ) {}
 
   async findAll(): Promise<IStore[]> {
     return this.storeModel.find().exec();
   }
+
   async pegaLojasProximas(cep: string): Promise<IDistanciaLojas[]> {
     const enderecoCliente = await pegaEndereco(cep);
     const enderecoFormatado = `${enderecoCliente.rua}, ${enderecoCliente.bairro}, ${enderecoCliente.cidade} - ${enderecoCliente.uf}, Brasil`;
@@ -31,6 +38,7 @@ export class StoresService {
         loja.bairro === enderecoCliente.bairro &&
         loja.estado === enderecoCliente.estado
       ) {
+        const coordenadasLoja = await pegaCoordenadas(loja.cep);
         lojasPorDistancia.push({
           nome: loja.nome,
           rua: loja.rua,
@@ -41,6 +49,7 @@ export class StoresService {
           uf: loja.uf,
           complemento: loja.complemento || 'Não informado',
           cep: loja.cep,
+          coordenadas: coordenadasLoja,
         });
         continue;
       }
@@ -50,6 +59,7 @@ export class StoresService {
         : `${loja.rua}, ${loja.bairro}, ${loja.cidade} - ${loja.uf}, Brasil`;
 
       const distancia = await calculaDistancia(enderecoFormatado, enderecoLoja);
+      const coordenadasLoja = await pegaCoordenadas(enderecoLoja);
       const medidas = converteMedidas(distancia);
 
       const distanciaLoja: IDistanciaLojas = {
@@ -62,28 +72,53 @@ export class StoresService {
         uf: loja.uf,
         complemento: loja.complemento || 'Não informado',
         cep: loja.cep,
+        coordenadas: coordenadasLoja,
       };
 
       console.log(lojasPorDistancia.push(distanciaLoja));
+      console.log(lojasPorDistancia);
     }
 
-    ordenarRotas(lojasPorDistancia);
-    const resultadoPDV = await this.entregaPDVOuVirtual(lojasPorDistancia, cep);
-    return resultadoPDV;
+    return ordenarRotas(lojasPorDistancia);
   }
   async entregaPDVOuVirtual(
     lojasPorDistancia: IDistanciaLojas[],
     cepCliente: string,
-  ): Promise<IDistanciaLojas[]> {
+  ): Promise<LojaComFreteFormatado> {
     for (const loja of lojasPorDistancia) {
       if (loja.distancia <= 50) {
-        loja.tipo = 'PDV';
-        loja.frete = '$15,00';
-        loja.descricao = 'Carro';
-        loja.prazo = '1 dia útil';
-        return [loja]; // Retorna array com um item
+        return {
+          name: loja.nome,
+          city: loja.bairro,
+          postalCode: loja.cep,
+          type: 'PDV',
+          distance: `${loja.distancia} km`,
+          value: [
+            {
+              prazo: '1 dia útil',
+              codProdutoAgencia: '00000',
+              price: 'R$ 15,00',
+              description: 'Motoboy',
+            },
+          ],
+          latitude: loja.coordenadas.lat.toString(),
+          longitude: loja.coordenadas.lng.toString(),
+        };
       }
     }
-    return await calculaFrete(lojasPorDistancia[0], cepCliente); // Já é array
+
+    return await calculaFrete(lojasPorDistancia[0], cepCliente);
+  }
+
+  async findById(id: string) {
+    return this.storeModel.findById(id);
+  }
+  async storeByState(state: string) {
+    return await this.storeModel.find({
+      $or: [
+        { estado: { $regex: `^${state}`, $options: 'i' } },
+        { uf: { $regex: `^${state}`, $options: 'i' } },
+      ],
+    });
   }
 }

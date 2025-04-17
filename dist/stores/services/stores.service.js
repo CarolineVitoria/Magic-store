@@ -48,6 +48,7 @@ let StoresService = class StoresService {
                 if (loja.rua === enderecoCliente.rua &&
                     loja.bairro === enderecoCliente.bairro &&
                     loja.estado === enderecoCliente.estado) {
+                    const coordenadasLoja = yield (0, diastancia_1.pegaCoordenadas)(loja.cep);
                     lojasPorDistancia.push({
                         nome: loja.nome,
                         rua: loja.rua,
@@ -58,6 +59,7 @@ let StoresService = class StoresService {
                         uf: loja.uf,
                         complemento: loja.complemento || 'Não informado',
                         cep: loja.cep,
+                        coordenadas: coordenadasLoja,
                     });
                     continue;
                 }
@@ -65,6 +67,7 @@ let StoresService = class StoresService {
                     ? `${loja.rua}, ${loja.numero} ${loja.bairro}, ${loja.cidade} - ${loja.uf}, Brasil`
                     : `${loja.rua}, ${loja.bairro}, ${loja.cidade} - ${loja.uf}, Brasil`;
                 const distancia = yield (0, diastancia_1.calculaDistancia)(enderecoFormatado, enderecoLoja);
+                const coordenadasLoja = yield (0, diastancia_1.pegaCoordenadas)(enderecoLoja);
                 const medidas = (0, diastancia_1.converteMedidas)(distancia);
                 const distanciaLoja = {
                     nome: loja.nome,
@@ -76,26 +79,53 @@ let StoresService = class StoresService {
                     uf: loja.uf,
                     complemento: loja.complemento || 'Não informado',
                     cep: loja.cep,
+                    coordenadas: coordenadasLoja,
                 };
                 console.log(lojasPorDistancia.push(distanciaLoja));
+                console.log(lojasPorDistancia);
             }
-            (0, diastancia_1.ordenarRotas)(lojasPorDistancia);
-            const resultadoPDV = yield this.entregaPDVOuVirtual(lojasPorDistancia, cep);
-            return resultadoPDV;
+            return (0, diastancia_1.ordenarRotas)(lojasPorDistancia);
         });
     }
     entregaPDVOuVirtual(lojasPorDistancia, cepCliente) {
         return __awaiter(this, void 0, void 0, function* () {
             for (const loja of lojasPorDistancia) {
                 if (loja.distancia <= 50) {
-                    loja.tipo = 'PDV';
-                    loja.frete = '$15,00';
-                    loja.descricao = 'Carro';
-                    loja.prazo = '1 dia útil';
-                    return [loja]; // Retorna array com um item
+                    return {
+                        name: loja.nome,
+                        city: loja.bairro,
+                        postalCode: loja.cep,
+                        type: 'PDV',
+                        distance: `${loja.distancia} km`,
+                        value: [
+                            {
+                                prazo: '1 dia útil',
+                                codProdutoAgencia: '00000',
+                                price: 'R$ 15,00',
+                                description: 'Motoboy',
+                            },
+                        ],
+                        latitude: loja.coordenadas.lat.toString(),
+                        longitude: loja.coordenadas.lng.toString(),
+                    };
                 }
             }
-            return yield (0, frete_service_1.calculaFrete)(lojasPorDistancia[0], cepCliente); // Já é array
+            return yield (0, frete_service_1.calculaFrete)(lojasPorDistancia[0], cepCliente);
+        });
+    }
+    findById(id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.storeModel.findById(id);
+        });
+    }
+    storeByState(state) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.storeModel.find({
+                $or: [
+                    { estado: { $regex: `^${state}`, $options: 'i' } },
+                    { uf: { $regex: `^${state}`, $options: 'i' } },
+                ],
+            });
         });
     }
 };

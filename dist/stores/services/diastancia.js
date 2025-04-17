@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ordenarRotas = exports.converteMedidas = exports.calculaDistancia = void 0;
+exports.pegaCoordenadas = exports.ordenarRotas = exports.converteMedidas = exports.calculaDistancia = void 0;
 const axios_1 = __importDefault(require("axios"));
 const calculaDistancia = (origem, destino) => __awaiter(void 0, void 0, void 0, function* () {
     const apiKey = process.env.KEY;
@@ -44,3 +44,14 @@ const ordenarRotas = (lojas) => {
     return lojas.sort((a, b) => Number(a.distancia) - Number(b.distancia));
 };
 exports.ordenarRotas = ordenarRotas;
+const pegaCoordenadas = (cep) => __awaiter(void 0, void 0, void 0, function* () {
+    const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(cep)}&key=${process.env.KEY}`;
+    const response = yield fetch(url);
+    const data = yield response.json();
+    if (data.status === 'OK') {
+        const location = data.results[0].geometry.location;
+        return { lat: location.lat, lng: location.lng };
+    }
+    throw new Error('Não foi possível obter as coordenadas.');
+});
+exports.pegaCoordenadas = pegaCoordenadas;

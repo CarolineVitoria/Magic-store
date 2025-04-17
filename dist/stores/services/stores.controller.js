@@ -28,53 +28,91 @@ let StoresController = class StoresController {
     constructor(storesService) {
         this.storesService = storesService;
     }
-    todasLojas() {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                // Aqui, o serviço pode chamar o modelo ou repositório que acessa o banco
-                const stores = yield this.storesService.findAll();
-                if (stores.length === 0) {
-                    throw new common_1.HttpException('Nenhuma loja encontrada!', common_1.HttpStatus.NOT_FOUND);
-                }
-                return stores;
-            }
-            catch (error) {
-                // Caso ocorra um erro na consulta, usamos status 500
-                throw new common_1.HttpException('Erro ao buscar lojas', common_1.HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        });
-    }
     getLojasProximas(cep, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const lojas = yield this.storesService.pegaLojasProximas(cep);
-                if (lojas.length !== 0) {
-                    return res.status(common_1.HttpStatus.OK).json(lojas);
-                }
-                else {
+                if (lojas.length === 0) {
                     return res.status(common_1.HttpStatus.NOT_FOUND).json({
                         message: 'Não foi encontrada nenhuma loja próxima a você',
                     });
                 }
+                const lojaComFrete = yield this.storesService.entregaPDVOuVirtual(lojas, cep);
+                const pins = [
+                    {
+                        name: lojaComFrete.name,
+                        latitude: lojaComFrete.latitude,
+                        longitude: lojaComFrete.longitude,
+                    },
+                ];
+                return res.status(common_1.HttpStatus.OK).json({
+                    stores: [lojaComFrete],
+                    pins,
+                    limit: 1,
+                    offset: 0,
+                    total: 1,
+                });
             }
             catch (error) {
-                if (error instanceof Error) {
-                    res.status(400).json({ message: error.message });
-                }
-                else {
-                    res.status(400).json({ message: 'Erro desconhecido' });
-                }
+                return this.handleError(res, error);
             }
         });
     }
+    storeByID(id, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const store = yield this.storesService.findById(id);
+                if (!store) {
+                    return res.status(common_1.HttpStatus.NOT_FOUND).json({
+                        message: 'Loja não encontrada',
+                    });
+                }
+                return res.status(common_1.HttpStatus.OK).json({
+                    store,
+                    limit: 1,
+                    offset: 0,
+                });
+            }
+            catch (error) {
+                return this.handleError(res, error);
+            }
+        });
+    }
+    storeByState(state, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                let formattedState = state.trim();
+                const store = yield this.storesService.storeByState(formattedState);
+                if (store.length === 0) {
+                    return res.status(common_1.HttpStatus.NOT_FOUND).json({
+                        message: 'Loja não encontrada',
+                    });
+                }
+                return res.status(common_1.HttpStatus.OK).json({
+                    store,
+                    limit: 1,
+                    offset: 0,
+                });
+            }
+            catch (error) {
+                return this.handleError(res, error);
+            }
+        });
+    }
+    handleError(res, error) {
+        if (error instanceof Error) {
+            return res
+                .status(common_1.HttpStatus.BAD_REQUEST)
+                .json({ message: error.message });
+        }
+        else {
+            return res
+                .status(common_1.HttpStatus.BAD_REQUEST)
+                .json({ message: 'Erro desconhecido' });
+        }
+    }
 };
 exports.StoresController = StoresController;
-__decorate([
-    (0, common_1.Get)(),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
-    __metadata("design:returntype", Promise)
-], StoresController.prototype, "todasLojas", null);
 __decorate([
     (0, common_1.Get)(':cep'),
     __param(0, (0, common_1.Param)('cep')),
@@ -83,6 +121,22 @@ __decorate([
     __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", Promise)
 ], StoresController.prototype, "getLojasProximas", null);
+__decorate([
+    (0, common_1.Get)('by-id/:id'),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Res)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", Promise)
+], StoresController.prototype, "storeByID", null);
+__decorate([
+    (0, common_1.Get)('by-state/:state'),
+    __param(0, (0, common_1.Param)('state')),
+    __param(1, (0, common_1.Res)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", Promise)
+], StoresController.prototype, "storeByState", null);
 exports.StoresController = StoresController = __decorate([
     (0, common_1.Controller)('api/stores'),
     __metadata("design:paramtypes", [stores_service_1.StoresService])

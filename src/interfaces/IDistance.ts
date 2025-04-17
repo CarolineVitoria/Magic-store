@@ -16,4 +16,8 @@ export interface IDistanciaLojas {
   prazo?: string;
   descricao?: string;
   cep: string;
+  coordenadas: {
+    lat: number;
+    lng: number;
+  };
 }

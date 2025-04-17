@@ -23,8 +23,8 @@ const calculaFrete = (loja, cepCliente) => __awaiter(void 0, void 0, void 0, fun
         'User-Agent': 'PhysicalStore/1.0',
     };
     const corpo = {
-        from: { postal_code: `${loja.cep}` },
-        to: { postal_code: `${cepCliente}` },
+        from: { postal_code: loja.cep },
+        to: { postal_code: cepCliente },
         products: [
             {
                 id: '1',
@@ -37,11 +37,35 @@ const calculaFrete = (loja, cepCliente) => __awaiter(void 0, void 0, void 0, fun
             },
         ],
     };
-    console.log('em calcula frete');
-    console.log(loja);
-    console.log(cepCliente);
-    const resposta = yield axios_1.default.post(url, corpo, { headers });
-    console.log(resposta);
-    return resposta.data;
+    console.log('test');
+    const { data } = yield axios_1.default.post(url, corpo, { headers });
+    console.log(data);
+    const codigosCorreios = {
+        PAC: '04510',
+        SEDEX: '04014',
+    };
+    const descricoesCorreios = {
+        PAC: 'PAC a encomenda economica dos Correios',
+        SEDEX: 'Sedex a encomenda expressa dos Correios',
+    };
+    const fretes = data.slice(0, 2).map((frete) => {
+        const nome = frete.name.toUpperCase();
+        return {
+            prazo: `${frete.delivery_time} dias úteis`,
+            codProdutoAgencia: codigosCorreios[nome] || '00000',
+            price: `${frete.currency} ${frete.price}`,
+            description: descricoesCorreios[nome] || nome,
+        };
+    });
+    return {
+        name: loja.nome,
+        city: loja.bairro,
+        postalCode: loja.cep,
+        type: 'LOJA',
+        distance: `${loja.distancia} km`,
+        value: fretes,
+        latitude: loja.coordenadas.lat.toString(),
+        longitude: loja.coordenadas.lng.toString(),
+    };
 });
 exports.calculaFrete = calculaFrete;

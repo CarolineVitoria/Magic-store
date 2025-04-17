@@ -11,7 +11,7 @@ import { MongooseModule } from '@nestjs/mongoose';
         const connectionString = configService.get<string>(
           'DB_CONNECTION_STRING',
         );
-        console.log('URI do Mongo:', connectionString); // 👈 debug
+        console.log('URI do Mongo:', connectionString);
 
         // Adicionando o logger personalizado
         //const Logger = new logger();
