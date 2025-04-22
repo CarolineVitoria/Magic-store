@@ -1,4 +1,3 @@
-// stores/services/diastancia.spec.ts
 import axios from 'axios';
 import {
   calculaDistancia,
