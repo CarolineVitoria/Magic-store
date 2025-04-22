@@ -10,4 +10,6 @@ export interface IStore {
   uf: string;
   numero?: string;
   _id: Types.ObjectId;
+  latitude: string;
+  longitude: string;
 }

@@ -35,5 +35,8 @@ export default [
         },
       },
     },
+    env: {
+      jest: true, // Isso habilita as globais do Jest
+    },
   },
 ];
