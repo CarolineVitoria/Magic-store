@@ -1,11 +1,9 @@
-// src/stores/stores.service.ts
 import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose'; // Importar o decorator InjectModel
+import { InjectModel } from '@nestjs/mongoose'; 
 import { Model } from 'mongoose';
 import { IStore } from '../../interfaces/IStore';
 import { pegaEndereco } from '../../utils/cep.service';
 import { IDistanciaLojas } from '../../interfaces/IDistance';
-import Store from '../../models/StoreModel';
 import { calculaFrete } from '../../utils/frete.service';
 import { LojaComFreteFormatado } from '../../interfaces/IFrete';
 import {
@@ -20,6 +18,7 @@ export class StoresService {
   constructor(
     @InjectModel('stores') private readonly storeModel: Model<IStore>,
   ) {}
+  
 
   async findAll(): Promise<IStore[]> {
     return this.storeModel.find().exec();

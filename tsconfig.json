@@ -8,5 +8,9 @@
     "esModuleInterop": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-  }
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "types": ["node", "jest"]
+  },
+  "exclude": ["node_modules", "dist"]
 }

@@ -16,7 +16,7 @@ exports.calculaFrete = void 0;
 const axios_1 = __importDefault(require("axios"));
 const calculaFrete = (loja, cepCliente) => __awaiter(void 0, void 0, void 0, function* () {
     const url = 'https://melhorenvio.com.br/api/v2/me/shipment/calculate';
-    const token = process.env.TOKEN_MELHOR_ENVIO || 'seu_token_default';
+    const token = process.env.TOKEN_MELHOR_ENVIO;
     const headers = {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
@@ -37,9 +37,7 @@ const calculaFrete = (loja, cepCliente) => __awaiter(void 0, void 0, void 0, fun
             },
         ],
     };
-    console.log('test');
     const { data } = yield axios_1.default.post(url, corpo, { headers });
-    console.log(data);
     const codigosCorreios = {
         PAC: '04510',
         SEDEX: '04014',

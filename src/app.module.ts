@@ -1,10 +1,10 @@
 // src/app.module.ts
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { StoresService } from './stores/services/stores.service';
+
 import { DatabaseModule } from './database/database.module';
 import { StoresModule } from './stores/services/stores.module';
-import { StoresController } from './stores/services/stores.controller';
+
 
 @Module({
   imports: [

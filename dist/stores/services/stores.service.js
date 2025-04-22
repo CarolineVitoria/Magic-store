@@ -22,9 +22,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.StoresService = void 0;
-// src/stores/stores.service.ts
 const common_1 = require("@nestjs/common");
-const mongoose_1 = require("@nestjs/mongoose"); // Importar o decorator InjectModel
+const mongoose_1 = require("@nestjs/mongoose");
 const mongoose_2 = require("mongoose");
 const cep_service_1 = require("../../utils/cep.service");
 const frete_service_1 = require("../../utils/frete.service");

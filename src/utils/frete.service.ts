@@ -7,7 +7,7 @@ export const calculaFrete = async (
 ): Promise<LojaComFreteFormatado> => {
   const url = 'https://melhorenvio.com.br/api/v2/me/shipment/calculate';
 
-  const token = process.env.TOKEN_MELHOR_ENVIO || 'seu_token_default';
+  const token = process.env.TOKEN_MELHOR_ENVIO;
 
   const headers = {
     'Content-Type': 'application/json',
@@ -30,9 +30,9 @@ export const calculaFrete = async (
       },
     ],
   };
-  console.log('test');
+
   const { data } = await axios.post(url, corpo, { headers });
-  console.log(data);
+
 
   const codigosCorreios: Record<string, string> = {
     PAC: '04510',

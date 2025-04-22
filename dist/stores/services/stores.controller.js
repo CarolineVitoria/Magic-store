@@ -28,16 +28,31 @@ let StoresController = class StoresController {
     constructor(storesService) {
         this.storesService = storesService;
     }
-    getLojasProximas(cep, res) {
+    findAll() {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const lojas = yield this.storesService.pegaLojasProximas(cep);
-                if (lojas.length === 0) {
-                    return res.status(common_1.HttpStatus.NOT_FOUND).json({
-                        message: 'Não foi encontrada nenhuma loja próxima a você',
-                    });
+                const stores = yield this.storesService.findAll();
+                return {
+                    stores,
+                    total: stores.length
+                };
+            }
+            catch (error) {
+                if (error instanceof Error) {
+                    throw new common_1.BadRequestException(error.message);
                 }
-                const lojaComFrete = yield this.storesService.entregaPDVOuVirtual(lojas, cep);
+                throw new common_1.BadRequestException('Erro ao buscar lojas');
+            }
+        });
+    }
+    getFrete(cep) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const stores = yield this.storesService.pegaLojasProximas(cep);
+                if (stores.length === 0) {
+                    throw new common_1.NotFoundException('Não foi encontrada nenhuma loja próxima a você');
+                }
+                const lojaComFrete = yield this.storesService.entregaPDVOuVirtual(stores, cep);
                 const pins = [
                     {
                         name: lojaComFrete.name,
@@ -45,96 +60,98 @@ let StoresController = class StoresController {
                         longitude: lojaComFrete.longitude,
                     },
                 ];
-                return res.status(common_1.HttpStatus.OK).json({
+                return {
                     stores: [lojaComFrete],
                     pins,
-                    limit: 1,
-                    offset: 0,
-                    total: 1,
-                });
+                };
             }
             catch (error) {
-                return this.handleError(res, error);
+                if (error instanceof Error) {
+                    throw new common_1.BadRequestException(error.message);
+                }
+                throw new common_1.BadRequestException('Erro ao buscar lojas próximas');
             }
         });
     }
-    storeByID(id, res) {
+    storeByID(id) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const store = yield this.storesService.findById(id);
                 if (!store) {
-                    return res.status(common_1.HttpStatus.NOT_FOUND).json({
-                        message: 'Loja não encontrada',
-                    });
+                    throw new common_1.NotFoundException('Loja não encontrada');
                 }
-                return res.status(common_1.HttpStatus.OK).json({
+                const pins = [
+                    {
+                        name: store.nome,
+                        latitude: store.latitude,
+                        longitude: store.longitude,
+                    },
+                ];
+                return {
                     store,
+                    pins,
                     limit: 1,
                     offset: 0,
-                });
+                };
             }
             catch (error) {
-                return this.handleError(res, error);
+                if (error instanceof Error) {
+                    throw new common_1.BadRequestException(error.message);
+                }
+                throw new common_1.BadRequestException('Erro ao buscar loja por ID');
             }
         });
     }
-    storeByState(state, res) {
+    storeByState(state) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                let formattedState = state.trim();
-                const store = yield this.storesService.storeByState(formattedState);
-                if (store.length === 0) {
-                    return res.status(common_1.HttpStatus.NOT_FOUND).json({
-                        message: 'Loja não encontrada',
-                    });
+                const formattedState = state.trim();
+                const stores = yield this.storesService.storeByState(formattedState);
+                if (stores.length === 0) {
+                    throw new common_1.NotFoundException('Nenhuma loja encontrada para esse estado');
                 }
-                return res.status(common_1.HttpStatus.OK).json({
-                    store,
-                    limit: 1,
+                return {
+                    store: stores,
+                    limit: stores.length,
                     offset: 0,
-                });
+                    total: stores.length,
+                };
             }
             catch (error) {
-                return this.handleError(res, error);
+                if (error instanceof Error) {
+                    throw new common_1.BadRequestException(error.message);
+                }
+                throw new common_1.BadRequestException('Erro ao buscar lojas por estado');
             }
         });
-    }
-    handleError(res, error) {
-        if (error instanceof Error) {
-            return res
-                .status(common_1.HttpStatus.BAD_REQUEST)
-                .json({ message: error.message });
-        }
-        else {
-            return res
-                .status(common_1.HttpStatus.BAD_REQUEST)
-                .json({ message: 'Erro desconhecido' });
-        }
     }
 };
 exports.StoresController = StoresController;
 __decorate([
+    (0, common_1.Get)('/'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], StoresController.prototype, "findAll", null);
+__decorate([
     (0, common_1.Get)(':cep'),
     __param(0, (0, common_1.Param)('cep')),
-    __param(1, (0, common_1.Res)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
-], StoresController.prototype, "getLojasProximas", null);
+], StoresController.prototype, "getFrete", null);
 __decorate([
     (0, common_1.Get)('by-id/:id'),
     __param(0, (0, common_1.Param)('id')),
-    __param(1, (0, common_1.Res)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], StoresController.prototype, "storeByID", null);
 __decorate([
     (0, common_1.Get)('by-state/:state'),
     __param(0, (0, common_1.Param)('state')),
-    __param(1, (0, common_1.Res)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], StoresController.prototype, "storeByState", null);
 exports.StoresController = StoresController = __decorate([

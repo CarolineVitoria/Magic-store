@@ -1,29 +1,23 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-const mongoose_1 = __importDefault(require("mongoose"));
-const storeSchema = new mongoose_1.default.Schema({
+exports.StoreSchema = void 0;
+const mongoose_1 = require("mongoose");
+exports.StoreSchema = new mongoose_1.Schema({
     nome: {
         type: String,
         required: [true, 'O nome é obrigatório'],
-        minlength: [11, 'o nome deve ter pelo menos 11 letras'],
+        minlength: [11, 'O nome deve ter pelo menos 11 letras'],
         unique: [true, 'Já existe uma loja com esse nome'],
     },
     cep: {
-        //precisa ser String pq se o CEP começa com 0 o mongo por padrão irá tirar-lo
         type: String,
         required: [true, 'O CEP é obrigatório'],
-        unique: [
-            true,
-            'Já existe uma loja com esse CEP, não é possível que duas lojas diferentes tenham o mesmo CEP.',
-        ],
-        minlength: [8, 'O cep só tem 8 números'],
+        unique: [true, 'Já existe uma loja com esse CEP'],
+        minlength: [8, 'O cep deve ter 8 números'],
     },
     cidade: {
         type: String,
-        required: [true, 'A Cidade é obrigatória'],
+        required: [true, 'A cidade é obrigatória'],
     },
     rua: {
         type: String,
@@ -31,14 +25,14 @@ const storeSchema = new mongoose_1.default.Schema({
     },
     bairro: {
         type: String,
-        required: [true, 'O bairro é obrigatória'],
+        required: [true, 'O bairro é obrigatório'],
     },
     complemento: {
         type: String,
     },
     estado: {
         type: String,
-        required: [true, 'O estado é Obrigatório'],
+        required: [true, 'O estado é obrigatório'],
     },
     uf: {
         type: String,
@@ -48,5 +42,3 @@ const storeSchema = new mongoose_1.default.Schema({
         type: String,
     },
 });
-const Store = mongoose_1.default.model('stores', storeSchema);
-exports.default = Store;

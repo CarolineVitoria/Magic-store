@@ -9,7 +9,9 @@
     "start:debug": "nest start --debug --watch",
     "build": "nest build",
     "prettier": "prettier --write ./src/**/*.ts",
-    "eslint": "npx eslint ./src"
+    "eslint": "npx eslint ./src",
+    "test:watch": "jest --watch",
+    "test": "jest"
   },
   "author": "",
   "license": "ISC",
