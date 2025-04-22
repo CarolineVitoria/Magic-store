@@ -126,32 +126,43 @@ A API estará disponível em `http://localhost:3000`.
     "statusCode": 400,
     "message": "Erro ao buscar loja por ID"
   }
-]
+  ```
 
-❌ 400 Bad Request - CEP inválido
+### 4. **Buscar lojas por estado**
 
-{
-  "error": "CEP inválido ou formato incorreto"
-}
+- **Rota**: `GET /api/stores/by-state/:state`
+- **Parâmetros**:
+  - `state` (obrigatório): O estado para filtrar as lojas.
+- **Descrição**: Retorna uma lista de lojas filtradas pelo estado informado.
+- **Respostas**:
+  - **200**: Lista de lojas no estado informado.
+  ```json
+  {
+    "store": [...],
+    "limit": 10,
+    "offset": 0,
+    "total": 10
+  }
+  ```
+  - **404**: Nenhuma loja encontrada para o estado fornecido.
+  ```json
+  {
+    "statusCode": 404,
+    "message": "Nenhuma loja encontrada para esse estado"
+  }
+  ```
+  - **400**: Erro ao buscar lojas por estado.
+  ```json
+  {
+    "statusCode": 400,
+    "message": "Erro ao buscar lojas por estado"
+  }
+  ```
 
-❌ 404 Not Found - Nenhuma loja encontrada
+### 👨‍💻 Autor
 
-{
-  "message": "Nenhuma loja encontrada em um raio de 100km"
-}
+Feito com ❤️ por Vih
+
+---
 
 
-
-⸻
-
-⚙ Tecnologias Utilizadas
-	•	Node.js
-	•	Express
-	•	TypeScript
-	•	MongoDB
-
-⸻
-
-🚀 Criado por: vih
-
-⸻
