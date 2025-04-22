@@ -24,6 +24,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.StoresController = void 0;
 const common_1 = require("@nestjs/common");
 const stores_service_1 = require("./stores.service");
+const swagger_1 = require("@nestjs/swagger");
 let StoresController = class StoresController {
     constructor(storesService) {
         this.storesService = storesService;
@@ -129,12 +130,16 @@ let StoresController = class StoresController {
 exports.StoresController = StoresController;
 __decorate([
     (0, common_1.Get)('/'),
+    (0, swagger_1.ApiOperation)({ summary: 'Listar todas as lojas' }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'Lista de lojas retornada com sucesso.' }),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
 ], StoresController.prototype, "findAll", null);
 __decorate([
     (0, common_1.Get)(':cep'),
+    (0, swagger_1.ApiOperation)({ summary: 'Buscar lojas próximas por CEP' }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'Retorna lojas próximas com cálculo de frete e pins.' }),
     __param(0, (0, common_1.Param)('cep')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
@@ -142,6 +147,8 @@ __decorate([
 ], StoresController.prototype, "getFrete", null);
 __decorate([
     (0, common_1.Get)('by-id/:id'),
+    (0, swagger_1.ApiOperation)({ summary: 'Buscar loja por ID' }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'Retorna loja com base no ID' }),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
@@ -149,6 +156,8 @@ __decorate([
 ], StoresController.prototype, "storeByID", null);
 __decorate([
     (0, common_1.Get)('by-state/:state'),
+    (0, swagger_1.ApiOperation)({ summary: 'Buscar lojas por estado' }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'Lista de lojas no estado informado' }),
     __param(0, (0, common_1.Param)('state')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),

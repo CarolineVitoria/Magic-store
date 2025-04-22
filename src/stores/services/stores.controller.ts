@@ -6,11 +6,14 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { StoresService } from './stores.service';
+import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 
 @Controller('api/stores')
 export class StoresController {
   constructor(private readonly storesService: StoresService) {}
   @Get('/')
+  @ApiOperation({ summary: 'Listar todas as lojas' })
+  @ApiResponse({ status: 200, description: 'Lista de lojas retornada com sucesso.' })
   async findAll(){
     try{
       const stores = await this.storesService.findAll();
@@ -28,6 +31,8 @@ export class StoresController {
 }
 
   @Get(':cep')
+  @ApiOperation({ summary: 'Buscar lojas próximas por CEP' })
+  @ApiResponse({ status: 200, description: 'Retorna lojas próximas com cálculo de frete e pins.'})
   async getFrete(@Param('cep') cep: string) {
     try {
       const stores = await this.storesService.pegaLojasProximas(cep);
@@ -59,6 +64,8 @@ export class StoresController {
   }
 
   @Get('by-id/:id')
+  @ApiOperation({ summary: 'Buscar loja por ID' })
+  @ApiResponse({ status: 200, description: 'Retorna loja com base no ID' })
   async storeByID(@Param('id') id: string) {
     try {
       const store = await this.storesService.findById(id);
@@ -90,6 +97,8 @@ export class StoresController {
   }
 
   @Get('by-state/:state')
+  @ApiOperation({ summary: 'Buscar lojas por estado' })
+  @ApiResponse({ status: 200, description: 'Lista de lojas no estado informado' })
   async storeByState(@Param('state') state: string) {
     try {
       const formattedState = state.trim();

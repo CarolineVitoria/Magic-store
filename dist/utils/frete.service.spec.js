@@ -74,8 +74,8 @@ describe('calculaFrete', () => {
                     description: 'Sedex a encomenda expressa dos Correios',
                 },
             ],
-            latitude: '-23.55',
-            longitude: '-46.63',
+            latitude: '-36.55',
+            longitude: '-55.23',
         });
         expect(mockedAxios.post).toHaveBeenCalledTimes(1);
     }));

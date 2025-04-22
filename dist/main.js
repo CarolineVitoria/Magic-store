@@ -1,5 +1,4 @@
 "use strict";
-// main.ts
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -12,16 +11,20 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const core_1 = require("@nestjs/core");
 const app_module_1 = require("./app.module");
-//import { logger } from './utils/logger';
+const swagger_1 = require("@nestjs/swagger");
 function bootstrap() {
     return __awaiter(this, void 0, void 0, function* () {
-        // Cria a instância do logger personalizado
-        //const myLogger = new logger();
-        // Passa o logger ao criar a aplicação
         const app = yield core_1.NestFactory.create(app_module_1.AppModule);
+        const config = new swagger_1.DocumentBuilder()
+            .setTitle('API Magic Stores')
+            .setDescription('Documentação da API Magic Sortes')
+            .setVersion('1.0')
+            .addTag('stores')
+            .build();
+        const document = swagger_1.SwaggerModule.createDocument(app, config);
+        swagger_1.SwaggerModule.setup('api/docs', app, document);
         const PORT = process.env.PORT || 3000;
         yield app.listen(PORT);
-        //myLogger.log(`App rodando em http://localhost:${PORT}`);
         console.log(`App rodando em http://localhost:${PORT}`);
     });
 }

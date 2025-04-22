@@ -19,7 +19,6 @@ exports.DatabaseModule = void 0;
 const common_1 = require("@nestjs/common");
 const config_1 = require("@nestjs/config");
 const mongoose_1 = require("@nestjs/mongoose");
-//import { logger } from '../utils/logger';
 let DatabaseModule = class DatabaseModule {
 };
 exports.DatabaseModule = DatabaseModule;
@@ -30,10 +29,6 @@ exports.DatabaseModule = DatabaseModule = __decorate([
                 imports: [config_1.ConfigModule],
                 useFactory: (configService) => __awaiter(void 0, void 0, void 0, function* () {
                     const connectionString = configService.get('DB_CONNECTION_STRING');
-                    console.log('URI do Mongo:', connectionString);
-                    // Adicionando o logger personalizado
-                    //const Logger = new logger();
-                    //Logger.log('Conectando ao banco de dados...');
                     console.log('Conectando ao banco de dados...');
                     return {
                         uri: connectionString,
